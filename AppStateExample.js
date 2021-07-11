@@ -14,8 +14,8 @@ const AppStateExample = () => {
   const [timeToForeground, setTimeToForeground] = useState('');
 
   /* ***************************************************************************
-  ===> Adicione um addEventListener que monitore quando o app entra
-  e quando volta do background; */
+  ===> useEffect que adiciona na lib 'AppState' um addEventListener que monitora
+  quando o app entra em background e quando ele volta para o primeiro plano; */
 
   useEffect(() => {
     AppState.addEventListener("change", _handleAppStateChange);
@@ -33,7 +33,7 @@ const AppStateExample = () => {
   let TimeToLogOut;
 
   /* ***************************************************************************
-  ===> Esta função é disparada quando o app entra em segundo plano. Ela inicia
+  ===> Esta função é disparada quando o app entra em background. Ela inicia
   o setTimeout com a contagem de tempo para efetuar o logout; */
 
   const StartLogOut = useCallback(
@@ -48,9 +48,9 @@ const AppStateExample = () => {
 
 
   /* ***************************************************************************
-  ===> A função stopLogOut é chamada pelo useEffec sempre que o app entrar ou
-  sair do primeiro plano. Ela compara e calcula a diferença de tempo entre a
-  saída e a volta ao primeiro plano e seta o valor na variável 'backgroundTime'.*/
+  ===> A função stopLogOut é chamada pelo useEffect sempre que o app entrar em
+  background ou voltar para o primeiro plano. Ela compara e calcula a diferença de
+  tempo entre um momento e o outro e seta o valor na variável 'backgroundTime'.*/
 
   const stopLogOut = useCallback(
     function stopLogOut(initialTime, finalTime) {
@@ -71,8 +71,8 @@ const AppStateExample = () => {
 
       /*
       ===> Se o tempo em background for menor do que o estabelecido no setTimout
-      o processamento entra na condicional e NÃO desloga o app. Caso contrário o
-      app é deslogado;
+      o processamento entra na condicional interrompe o setTimeout executando o
+      'clearTimeout' e NÃO desloga o app. Caso contrário o app é deslogado;
       */
       if (Horas === 0 && Minutos === 0 && Segundos < 15) {
         clearTimeout(TimeToLogOut);
@@ -85,8 +85,8 @@ const AppStateExample = () => {
   /* ************************************************************************ */
 
   /* ***************************************************************************
-  ===> Monitora as variáveis de entrada e saída do app em background e chama a
-  função 'stopLogOut'; */
+  ===> Monitora as variáveis de momento de entrada e de saída do app em
+  background e chama a função 'stopLogOut'; */
 
   useEffect(() => {
     const initialTime = timeToBackground;
@@ -97,13 +97,14 @@ const AppStateExample = () => {
 
 
   /* ***************************************************************************
-  Esta função é disparada toda vez que o app entra ou saí do primeiro plano; */
+  Esta função é um listener que é disparado toda vez que o app entra em
+  backgroud e quando ele volta para o primeiro plano; */
 
   const _handleAppStateChange = useCallback(
     function _handleAppStateChange(nextAppState) {
       /* ***********************************************************************
-      ===> Quando o app sair do primeiro plano capture o momento da saída
-      e chame a função 'StartLogOut';
+      ===> Quando o app entra em background captura o momento da saída e chama
+      a função 'StartLogOut' que é a responsável por disparar o setTimeout;
       *********************************************************************** */
       if (
         appState.current.match(/active|foreground/) &&
@@ -115,7 +116,7 @@ const AppStateExample = () => {
       }
 
       /* ***********************************************************************
-      ===> Quando o app voltar para o primeiro plano capture o momento da
+      ===> Quando o app volta para o primeiro plano captura o momento da
       volta;
       *********************************************************************** */
       if (
